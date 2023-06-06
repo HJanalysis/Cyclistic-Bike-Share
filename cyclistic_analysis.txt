@@ -1,0 +1,202 @@
+-- data cleaned in excel.
+--no duplicates were found
+-- deleted null values
+-- deleted unwanted columns
+-- added few columns like, start_weekday, end_weekday, month, day_type, tot_days
+-- corrected time in some places, where end time is more than start time
+--deleted 0 usage time data
+
+--combining all 12 months data
+create table `hjprojects1.Cyclist_capstone.ride_data`
+AS
+(SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_march`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_april`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_may`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_june`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_july`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_aug`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_sept`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_oct`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_nov`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2022_dec`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2023_jan`
+
+UNION ALL
+
+SELECT rideable_type, started_at, ended_at, start_station_name, end_station_name, start_lat, start_lng, end_lat, end_lng, member_casual, start_weekday, end_weekday, month, day_type, tot_days
+FROM `hjprojects1.Cyclist_capstone.2023_feb`)
+
+--view table
+SELECT *
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+
+--total rides from march 2022 till feb 2023
+SELECT COUNT(rideable_type)
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+
+--total rides monthwise
+select month, count(month) AS month_ride
+from `hjprojects1.Cyclist_capstone.ride_data`
+group by month
+
+-- count ridable typle month wise
+select rideable_type, month, count(rideable_type) AS rideable_monthwise
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+group by month, rideable_type
+
+--membership count monthwise
+select member_casual, month, count(member_casual) AS membershi_count
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+group by month, member_casual
+
+-- memebrship ride count
+SELECT member_casual, COUNT(member_casual) AS membership_count
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+GROUP BY member_casual
+
+--bike count based on weekday
+SELECT start_weekday, member_casual, COUNT(member_casual) AS tot_rides
+from `hjprojects1.Cyclist_capstone.ride_data`
+group by start_weekday, member_casual
+
+--average ride duration
+SELECT
+  AVG(TIMESTAMP_DIFF(ended_at, started_at,MINUTE)) AS avg_duration
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+
+--average ride length monthwise and membership type
+SELECT month, member_casual,
+  AVG(TIMESTAMP_DIFF(ended_at, started_at,MINUTE)) AS avg_duration
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+Group by month, member_casual
+
+--polular start staion
+SELECT 
+  start_station_name,
+  rideable_type,start_lng,start_lat, end_lat, end_lng,
+  COUNT(*) AS ride_totals
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+GROUP BY start_station_name, rideable_type, start_lng,start_lat, end_lat, end_lng
+ORDER BY ride_totals DESC
+LIMIT 20
+
+--polular end staion
+SELECT 
+  end_station_name,
+  rideable_type,start_lng,start_lat, end_lat, end_lng,
+  COUNT(*) AS ride_totals
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+GROUP BY end_station_name, rideable_type, start_lng,start_lat, end_lat, end_lng
+ORDER BY ride_totals DESC
+LIMIT 20
+
+--average per membership ride duration
+SELECT member_casual,
+  AVG(TIMESTAMP_DIFF(ended_at, started_at,MINUTE)) AS avg_duration
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+group by member_casual
+
+--tot member ride based on day type
+select member_casual, day_type, count(day_type) AS tot_ride
+from `hjprojects1.Cyclist_capstone.ride_data`
+group by member_casual, day_type
+
+--avg ride on membership type
+SELECT member_casual,
+  AVG(TIMESTAMP_DIFF(ended_at, started_at,MINUTE)) AS avg_duration
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+group by member_casual
+
+--average distance travelled per ride
+SELECT AVG(ST_DISTANCE(ST_GEOGPOINT(start_lng, start_lat), ST_GEOGPOINT(end_lng, end_lat))) AS avg_distance_traveled_per_ride
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+
+--average distance travelled per by membership type
+SELECT member_casual, AVG(ST_DISTANCE(ST_GEOGPOINT(start_lng, start_lat), ST_GEOGPOINT(end_lng, end_lat))) AS avg_distance_traveled_per_ride
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+group by member_casual
+
+--Most popular start and end stations
+SELECT start_station_name, end_station_name,start_lng,start_lat, end_lat, end_lng, COUNT(*) as total_rides
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+GROUP BY start_station_name, end_station_name,start_lng,start_lat, end_lat, end_lng
+ORDER BY total_rides DESC
+LIMIT 20
+
+--busiest day of the week
+SELECT start_weekday, COUNT(*) AS num_rides
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+GROUP BY start_weekday
+ORDER BY num_rides DESC
+
+--max, min and avg hiring days
+select member_casual, max(tot_days) AS max_hire_days, min(tot_days) As min_hire_days, avg(tot_days) AS avg_hire_days
+from `hjprojects1.Cyclist_capstone.ride_data`
+group by member_casual
+
+--rides per hour on weekday
+  SELECT EXTRACT(DAYOFWEEK FROM started_at) AS weekday, 
+  EXTRACT(HOUR FROM started_at) AS hour, 
+  COUNT(*) AS rides_per_hour
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+GROUP BY weekday,hour
+ORDER BY weekday,hour
+
+--rides on season basis
+SELECT EXTRACT(month FROM started_at) AS trip_month,
+  CASE
+    WHEN EXTRACT(month FROM started_at) IN (12, 1, 2) THEN 'Winter'
+    WHEN EXTRACT(month FROM started_at) IN (3, 4, 5) THEN 'Spring'
+    WHEN EXTRACT(month FROM started_at) IN (6, 7, 8) THEN 'Summer'
+    WHEN EXTRACT(month FROM started_at) IN (9, 10, 11) THEN 'Fall'
+    ELSE 'Unknown'
+  END AS season,
+  COUNT(*) AS ride_count
+FROM `hjprojects1.Cyclist_capstone.ride_data`
+GROUP BY season, trip_month
+
+--most popular bikes
+SELECT rideable_type, Count(rideable_type) AS popular_ride
+from `hjprojects1.Cyclist_capstone.ride_data`
+Group by rideable_type
